@@ -21,6 +21,18 @@
 
 #include "para.h"
 #include "util.h"
+#include "para.c"
+#include "util.c"
+
+void version(void);
+void todo_list(void);
+void brief(void);
+void loadfiles(const char* filename1, const char* filename2);
+void print_option(const char* name, int value);
+void diff_output_conflict_error(void);
+void setoption(const char* arg, const char* s, const char* t, int* value);
+void showoptions(const char* file1, const char* file2);
+void init_options_files(int argc, const char* argv[]);
 
 
 void version(void) {
@@ -31,6 +43,7 @@ void version(void) {
   printf("under the terms of the GNU General Public License.\n");
   printf("For more information about these matters, see the file named COPYING.\n");
   printf("Written by William McCarthy, Tony Stark, and Dr. Steven Strange\n");
+  printf("Edited and added onto by Dustin Vuong\n");
 }
 
 void todo_list(void) {
@@ -39,12 +52,31 @@ void todo_list(void) {
   printf("\nTODO: handle the rest of diff's options\n");
 }
 
-char buf[BUFLEN];
-char *strings1[MAXSTRINGS], *strings2[MAXSTRINGS];
-int showversion = 0, showbrief = 0, ignorecase = 0, report_identical = 0, showsidebyside = 0;
-int showleftcolumn = 0, showunified = 0, showcontext = 0, suppresscommon = 0, diffnormal = 0;
+static char buf[BUFLEN];
+static char *strings1[MAXSTRINGS], *strings2[MAXSTRINGS];
+static int showversion = 0, showbrief = 0, ignorecase = 0, report_identical = 0, showsidebyside = 0;
+static int showleftcolumn = 0, showunified = 0, showcontext = 0, suppresscommon = 0, diffnormal = 0;
 
-int count1 = 0, count2 = 0;
+static int count1 = 0, count2 = 0;
+
+void brief(void) {
+  int filesdiff = 0;
+  int c1 =0, c2 = 0;
+  para* p = para_first(strings1, count1);
+  para* q = para_first(strings2, count2);
+    while (p != NULL && q != NULL) {
+    if ((filesdiff = para_equal(p,q)) == 1) {
+      printf("files are the different\n");
+      return;
+    }
+    p = para_next(p);
+    q = para_next(q);
+  }
+  return;
+}
+
+
+
 
 
 void loadfiles(const char* filename1, const char* filename2) {
@@ -123,15 +155,17 @@ void init_options_files(int argc, const char* argv[]) {
   }
   
   if (showversion) { version();  exit(0); }
-  
+
   if (((showsidebyside || showleftcolumn) && (diffnormal || showcontext || showunified)) ||
       (showcontext && showunified) || (diffnormal && (showcontext || showunified))) {
 
     diff_output_conflict_error();
   }
   
-//  showoptions(files[0], files[1]);
+  showoptions(files[0], files[1]);
   loadfiles(files[0], files[1]);
+
+  if (showbrief) { brief(); exit(0); }
 }
 
 
