@@ -27,6 +27,7 @@
 void version(void);
 void todo_list(void);
 
+void side_by_side(void);
 void report_identical_files(void);
 void brief(void);
 
@@ -62,6 +63,39 @@ static int showleftcolumn = 0, showunified = 0, showcontext = 0, suppresscommon 
 
 static int count1 = 0, count2 = 0;
 
+void side_by_side(void) {
+    para* p = para_first(strings1, count1);
+  para* q = para_first(strings2, count2);
+  int foundmatch = 0;
+
+  para* qlast = q;
+  while (p != NULL) {
+    qlast = q;
+    foundmatch = 0;
+    while (q != NULL && (foundmatch = para_equal(p, q)) == 0) {
+      q = para_next(q);
+    }
+    q = qlast;
+
+    if (foundmatch) {
+      while ((foundmatch = para_equal(p, q)) == 0) {
+        para_print(q, printright);
+        q = para_next(q);
+        qlast = q;
+      }
+      para_print(q, printboth);
+      p = para_next(p);
+      q = para_next(q);
+    } else {
+      para_print(p, printleft);
+      p = para_next(p);
+    }
+  }
+  while (q != NULL) {
+    para_print(q, printright);
+    q = para_next(q);
+  }
+}
 
 void report_identical_files(void) {
   int filessame = 0;
@@ -181,7 +215,8 @@ void init_options_files(int argc, const char* argv[]) {
 
   if (showbrief) { brief(); exit(0); }
   if (report_identical) { report_identical_files(); exit(0); }
-  if (showbrief && report_identical) { brief; report_identical_files(); exit(0);
+  if (showbrief && report_identical) { brief(); report_identical_files(); exit(0); }
+  if (showsidebyside) { side_by_side(); exit(0); }
 }
 
 
@@ -190,7 +225,8 @@ int main(int argc, const char * argv[]) {
 
 //  para_printfile(strings1, count1, printleft);
 //  para_printfile(strings2, count2, printright);
-  
+ 
+/* 
   para* p = para_first(strings1, count1);
   para* q = para_first(strings2, count2);
   int foundmatch = 0;
@@ -222,6 +258,7 @@ int main(int argc, const char * argv[]) {
     para_print(q, printright);
     q = para_next(q);
   }
+*/
 
   return 0;
 }
