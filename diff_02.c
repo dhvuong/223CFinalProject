@@ -26,7 +26,10 @@
 
 void version(void);
 void todo_list(void);
+
+void report_identical_files(void);
 void brief(void);
+
 void loadfiles(const char* filename1, const char* filename2);
 void print_option(const char* name, int value);
 void diff_output_conflict_error(void);
@@ -59,12 +62,26 @@ static int showleftcolumn = 0, showunified = 0, showcontext = 0, suppresscommon 
 
 static int count1 = 0, count2 = 0;
 
-void brief(void) {
-  int filesdiff = 0;
-  int c1 =0, c2 = 0;
+
+void report_identical_files(void) {
+  int filessame = 0;
   para* p = para_first(strings1, count1);
   para* q = para_first(strings2, count2);
-    while (p != NULL && q != NULL) {
+  printf("1\n");
+  while (p != NULL || q != NULL) {
+    if((filessame = para_equal(p,q)) == 1) { return; }
+    p = para_next(p);
+    q = para_next(q);
+  }
+  printf("files are the same\n");
+  return;
+}
+
+void brief(void) {
+  int filesdiff = 0;
+  para* p = para_first(strings1, count1);
+  para* q = para_first(strings2, count2);
+    while (p != NULL || q != NULL) {
     if ((filesdiff = para_equal(p,q)) == 1) {
       printf("files are the different\n");
       return;
@@ -74,9 +91,6 @@ void brief(void) {
   }
   return;
 }
-
-
-
 
 
 void loadfiles(const char* filename1, const char* filename2) {
@@ -166,6 +180,8 @@ void init_options_files(int argc, const char* argv[]) {
   loadfiles(files[0], files[1]);
 
   if (showbrief) { brief(); exit(0); }
+  if (report_identical) { report_identical_files(); exit(0); }
+  if (showbrief && report_identical) { brief; report_identical_files(); exit(0);
 }
 
 
