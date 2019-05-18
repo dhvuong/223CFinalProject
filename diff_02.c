@@ -98,16 +98,13 @@ void side_by_side(void) {
 }
 
 void report_identical_files(void) {
-  int filessame = 0;
   para* p = para_first(strings1, count1);
   para* q = para_first(strings2, count2);
-  printf("1\n");
-  while (p != NULL || q != NULL) {
-    if((filessame = para_equal(p,q)) == 1) { return; }
+  while (p != NULL && q != NULL) {
     p = para_next(p);
     q = para_next(q);
   }
-  printf("files are the same\n");
+  if (p == q) { printf("files are the same\n"); }
   return;
 }
 
@@ -115,14 +112,11 @@ void brief(void) {
   int filesdiff = 0;
   para* p = para_first(strings1, count1);
   para* q = para_first(strings2, count2);
-    while (p != NULL || q != NULL) {
-    if ((filesdiff = para_equal(p,q)) == 1) {
-      printf("files are the different\n");
-      return;
-    }
+  while (p != NULL && q != NULL) {
     p = para_next(p);
     q = para_next(q);
   }
+  if (p != q) { printf("files are different\n"); }
   return;
 }
 
@@ -222,43 +216,6 @@ void init_options_files(int argc, const char* argv[]) {
 
 int main(int argc, const char * argv[]) {
   init_options_files(--argc, ++argv);
-
-//  para_printfile(strings1, count1, printleft);
-//  para_printfile(strings2, count2, printright);
- 
-/* 
-  para* p = para_first(strings1, count1);
-  para* q = para_first(strings2, count2);
-  int foundmatch = 0;
-
-  para* qlast = q;
-  while (p != NULL) {
-    qlast = q;
-    foundmatch = 0;
-    while (q != NULL && (foundmatch = para_equal(p, q)) == 0) {
-      q = para_next(q);
-    }
-    q = qlast;
-
-    if (foundmatch) {
-      while ((foundmatch = para_equal(p, q)) == 0) {
-        para_print(q, printright);
-        q = para_next(q);
-        qlast = q;
-      }
-      para_print(q, printboth);
-      p = para_next(p);
-      q = para_next(q);
-    } else {
-      para_print(p, printleft);
-      p = para_next(p);
-    }
-  }
-  while (q != NULL) {
-    para_print(q, printright);
-    q = para_next(q);
-  }
-*/
 
   return 0;
 }
